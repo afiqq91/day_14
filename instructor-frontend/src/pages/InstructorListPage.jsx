@@ -2,7 +2,12 @@ import { useEffect, useState } from "react";
 
 import { Link } from "react-router-dom";
 
-import { getAllInstructors } from "../services/instructorApi";
+import InstructorCard from "../components/InstructorCard";
+
+import {
+    getAllInstructors,
+    deleteInstructor
+} from "../services/instructorApi";
 
 export default function InstructorListPage() {
 
@@ -32,17 +37,54 @@ export default function InstructorListPage() {
 
     }, []);
 
+    async function handleDeleteInstructor(
+        instructor
+    ) {
+
+        try {
+
+            await deleteInstructor(
+                instructor.id
+            );
+
+            setInstructors(
+
+                instructors.filter(
+
+                    item =>
+                        item.id !== instructor.id
+                )
+            );
+
+        } catch (error) {
+
+            console.error(error);
+
+            alert(
+                "Failed to delete instructor"
+            );
+        }
+    }
+
     return (
+
         <div>
 
-            <h1>Instructor List Page</h1>
+            <h1>
+                Instructor List Page
+            </h1>
 
             {
                 isAdmin && (
-                    <Link to="/instructors/create">
+
+                    <Link
+                        to="/instructors/create"
+                    >
 
                         <button>
+
                             Create Instructor
+
                         </button>
 
                     </Link>
@@ -50,43 +92,31 @@ export default function InstructorListPage() {
             }
 
             {
-                instructors.map((instructor, index) => (
+                instructors.map(
+                    (instructor) => (
 
-                    <div
-                        key={index}
-                        style={{
-                            border: "1px solid black",
-                            padding: "10px",
-                            marginBottom: "10px"
-                        }}
-                    >
+                        <InstructorCard
 
-                        <h3>{instructor.name}</h3>
+                            key={
+                                instructor.id
+                            }
 
-                        <p>
-                            Specialization: {instructor.specialization}
-                        </p>
+                            instructor={
+                                instructor
+                            }
 
-                        <p>
-                            Experience: {instructor.yearsExperience} years
-                        </p>
+                            isAdmin={
+                                isAdmin
+                            }
 
-                        <Link to={`/instructors/${index}`}>
-                            View Details
-                        </Link>
+                            onDelete={
+                                handleDeleteInstructor
+                            }
 
-                        <br />
+                        />
 
-                        {
-                            isAdmin && (
-                                <Link to={`/instructors/${index}/edit`}>
-                                    Edit
-                                </Link>
-                            )
-                        }
-
-                    </div>
-                ))
+                    )
+                )
             }
 
         </div>
