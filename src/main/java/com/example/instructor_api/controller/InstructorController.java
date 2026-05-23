@@ -17,7 +17,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/instructors")
 public class InstructorController {
 
-    private List<Instructor> instructors =
+    private List<Instructor>
+            instructors =
             new ArrayList<>();
 
     private Long nextId = 1L;
@@ -27,6 +28,7 @@ public class InstructorController {
     getAllInstructors() {
 
         return instructors;
+
     }
 
     @PostMapping
@@ -46,6 +48,7 @@ public class InstructorController {
         );
 
         return instructor;
+
     }
 
     @GetMapping("/{id}")
@@ -66,16 +69,15 @@ public class InstructorController {
                         instructor ->
 
                                 instructor.id
-                                        .equals(
-                                                id
-                                        )
+
+                                        .equals(id)
+
                 )
 
                 .findFirst()
 
-                .orElse(
-                        null
-                );
+                .orElse(null);
+
     }
 
     @PutMapping("/{id}")
@@ -108,9 +110,7 @@ public class InstructorController {
 
                             .id
 
-                            .equals(
-                                    id
-                            )
+                            .equals(id)
 
             ) {
 
@@ -122,13 +122,17 @@ public class InstructorController {
                         i,
 
                         updatedInstructor
+
                 );
 
                 return updatedInstructor;
+
             }
+
         }
 
         return null;
+
     }
 
     @DeleteMapping("/{id}")
@@ -140,35 +144,50 @@ public class InstructorController {
 
     ) {
 
-        instructors.removeIf(
+        boolean removed =
 
-                instructor ->
+                instructors.removeIf(
 
-                        instructor.id
-                                .equals(
-                                        id
-                                )
-        );
+                        instructor ->
+
+                                instructor.id
+
+                                        .equals(id)
+
+                );
+
+        if (!removed) {
+
+            return ResponseEntity
+
+                    .notFound()
+
+                    .build();
+
+        }
 
         return ResponseEntity
 
                 .noContent()
 
                 .build();
+
     }
 
-    static class Instructor {
+}
 
-        public Long id;
+class Instructor {
 
-        public String name;
+    public Long id;
 
-        public String email;
+    public String name;
 
-        public String specialization;
+    public String email;
 
-        public int yearsExperience;
+    public String specialization;
 
-        public boolean active;
-    }
+    public int yearsExperience;
+
+    public boolean active;
+
 }

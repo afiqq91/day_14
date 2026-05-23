@@ -1,45 +1,35 @@
-import {
-    useEffect,
-    useState
-} from "react";
+import { useEffect, useState } from "react";
 
-import { Link } from "react-router-dom";
-
-import InstructorCard from "../components/InstructorCard";
-
-import SearchBox from "../components/SearchBox";
-
-import Pagination from "../components/Pagination";
+import InstructorCard
+from "../components/InstructorCard";
 
 import {
     getAllInstructors,
     deleteInstructor
-} from "../services/instructorApi";
+}
+from "../services/instructorApi";
 
-export default function InstructorListPage() {
+function InstructorListPage() {
 
-    const [instructors, setInstructors] =
-        useState([]);
+    const [
+        instructors,
+        setInstructors
+    ] = useState([]);
 
-    const [loading, setLoading] =
-        useState(true);
+    const [
+        loading,
+        setLoading
+    ] = useState(true);
 
-    const [error, setError] =
-        useState("");
+    const [
+        error,
+        setError
+    ] = useState("");
 
     const [
         successMessage,
         setSuccessMessage
     ] = useState("");
-
-    const [searchTerm, setSearchTerm] =
-        useState("");
-
-    const [currentPage, setCurrentPage] =
-        useState(1);
-
-    const [pageSize, setPageSize] =
-        useState(5);
 
     const role =
         localStorage.getItem(
@@ -51,45 +41,63 @@ export default function InstructorListPage() {
 
     useEffect(() => {
 
-        async function fetchInstructors() {
-
-            try {
-
-                setLoading(true);
-
-                const data =
-                    await getAllInstructors();
-
-                setInstructors(data);
-
-                setError("");
-
-            } catch (err) {
-
-                console.error(err);
-
-                setError(
-                    "Could not load instructors."
-                );
-
-            } finally {
-
-                setLoading(false);
-            }
-        }
-
-        fetchInstructors();
+        loadInstructors();
 
     }, []);
+
+    async function loadInstructors() {
+
+        try {
+
+            const response =
+                await getAllInstructors();
+
+            setInstructors(
+                response || []
+            );
+
+        } catch (err) {
+
+            console.error(err);
+
+            setError(
+                "Could not load instructors."
+            );
+
+        } finally {
+
+            setLoading(
+                false
+            );
+
+        }
+
+    }
 
     async function handleDeleteInstructor(
         instructor
     ) {
 
+        const confirmed =
+
+            window.confirm(
+
+                `Delete ${instructor.name}?`
+
+            );
+
+        if (!confirmed) {
+
+            return;
+
+        }
+
         try {
 
             await deleteInstructor(
+
                 instructor.id
+
             );
 
             const updatedInstructors =
@@ -98,131 +106,54 @@ export default function InstructorListPage() {
 
                     item =>
 
-                        item.id !== instructor.id
+                        item.id !==
+
+                        instructor.id
+
                 );
 
             setInstructors(
+
                 updatedInstructors
+
             );
 
             setSuccessMessage(
+
                 "Instructor deleted successfully."
+
             );
+
+            setError("");
 
         } catch (err) {
 
             console.error(err);
 
             setError(
+
                 "Could not delete instructor."
+
             );
+
+            setSuccessMessage("");
+
         }
+
     }
-
-    const filteredInstructors =
-
-        instructors.filter(
-            (instructor) => {
-
-                const term =
-                    searchTerm.toLowerCase();
-
-                return (
-
-                    instructor.name
-                        ?.toLowerCase()
-                        .includes(term)
-
-                    ||
-
-                    instructor.email
-                        ?.toLowerCase()
-                        .includes(term)
-
-                    ||
-
-                    instructor.specialization
-                        ?.toLowerCase()
-                        .includes(term)
-
-                    ||
-
-                    (
-                        instructor.active
-
-                            ?
-
-                            "active"
-
-                            :
-
-                            "inactive"
-
-                    ).includes(term)
-                );
-            }
-        );
-
-    const totalPages =
-
-        Math.ceil(
-            filteredInstructors.length
-            /
-            pageSize
-        )
-
-        ||
-
-        1;
-
-    const safeCurrentPage =
-
-        Math.min(
-            currentPage,
-            totalPages
-        );
-
-    const startIndex =
-
-        (
-            safeCurrentPage
-            -
-            1
-        )
-
-        *
-
-        pageSize;
-
-    const endIndex =
-
-        startIndex
-        +
-        pageSize;
-
-    const paginatedInstructors =
-
-        filteredInstructors.slice(
-            startIndex,
-            endIndex
-        );
 
     if (loading) {
 
         return (
-            <p>
-                Loading instructors...
-            </p>
-        );
-    }
 
-    if (error) {
+            <h2>
 
-        return (
-            <p>
-                {error}
-            </p>
+                Loading...
+
+            </h2>
+
         );
+
     }
 
     return (
@@ -230,93 +161,40 @@ export default function InstructorListPage() {
         <div>
 
             <h1>
-                Instructor List Page
+
+                Instructor List
+
             </h1>
 
             {
-                successMessage && (
 
-                    <p>
-                        {successMessage}
-                    </p>
-                )
-            }
+                successMessage &&
 
-            <SearchBox
+                <p>
 
-                searchTerm={
-                    searchTerm
-                }
+                    {successMessage}
 
-                onSearchChange={
-                    (value) => {
+                </p>
 
-                        setSearchTerm(
-                            value
-                        );
-
-                        setCurrentPage(
-                            1
-                        );
-                    }
-                }
-
-                resultCount={
-                    filteredInstructors.length
-                }
-
-                totalCount={
-                    instructors.length
-                }
-
-            />
-
-            {
-                instructors.length === 0 && (
-
-                    <p>
-                        No instructors found.
-                    </p>
-                )
             }
 
             {
-                instructors.length > 0
 
-                &&
+                error &&
 
-                filteredInstructors.length === 0
+                <p>
 
-                &&
+                    {error}
 
-                (
+                </p>
 
-                    <p>
-                        No instructors match your search.
-                    </p>
-                )
             }
 
             {
-                isAdmin && (
 
-                    <Link
-                        to="/instructors/create"
-                    >
+                instructors.map(
 
-                        <button>
-                            Create Instructor
-                        </button>
-
-                    </Link>
-                )
-            }
-
-            {
-                paginatedInstructors.map(
-                    (
-                        instructor
-                    ) => (
+                    instructor => (
 
                         <InstructorCard
 
@@ -337,43 +215,17 @@ export default function InstructorListPage() {
                             }
 
                         />
+
                     )
+
                 )
+
             }
 
-            <Pagination
-
-                currentPage={
-                    safeCurrentPage
-                }
-
-                totalPages={
-                    totalPages
-                }
-
-                pageSize={
-                    pageSize
-                }
-
-                onPageChange={
-                    setCurrentPage
-                }
-
-                onPageSizeChange={
-                    (size) => {
-
-                        setPageSize(
-                            size
-                        );
-
-                        setCurrentPage(
-                            1
-                        );
-                    }
-                }
-
-            />
-
         </div>
+
     );
+
 }
+
+export default InstructorListPage;

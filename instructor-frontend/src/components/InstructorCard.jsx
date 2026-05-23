@@ -155,10 +155,13 @@ function InstructorCard({
                     </>
 
                 )
+
             }
 
         </div>
+
     );
+
 }
 
 export default InstructorCard;
