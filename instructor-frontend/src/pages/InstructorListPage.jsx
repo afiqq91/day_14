@@ -18,40 +18,28 @@ import {
 
 export default function InstructorListPage() {
 
-    const [
-        instructors,
-        setInstructors
-    ] = useState([]);
+    const [instructors, setInstructors] =
+        useState([]);
 
-    const [
-        loading,
-        setLoading
-    ] = useState(true);
+    const [loading, setLoading] =
+        useState(true);
 
-    const [
-        error,
-        setError
-    ] = useState("");
+    const [error, setError] =
+        useState("");
 
     const [
         successMessage,
         setSuccessMessage
     ] = useState("");
 
-    const [
-        searchTerm,
-        setSearchTerm
-    ] = useState("");
+    const [searchTerm, setSearchTerm] =
+        useState("");
 
-    const [
-        currentPage,
-        setCurrentPage
-    ] = useState(1);
+    const [currentPage, setCurrentPage] =
+        useState(1);
 
-    const [
-        pageSize,
-        setPageSize
-    ] = useState(5);
+    const [pageSize, setPageSize] =
+        useState(5);
 
     const role =
         localStorage.getItem(
@@ -72,17 +60,13 @@ export default function InstructorListPage() {
                 const data =
                     await getAllInstructors();
 
-                setInstructors(
-                    data
-                );
+                setInstructors(data);
 
                 setError("");
 
             } catch (err) {
 
-                console.error(
-                    err
-                );
+                console.error(err);
 
                 setError(
                     "Could not load instructors."
@@ -90,9 +74,7 @@ export default function InstructorListPage() {
 
             } finally {
 
-                setLoading(
-                    false
-                );
+                setLoading(false);
             }
         }
 
@@ -110,13 +92,17 @@ export default function InstructorListPage() {
                 instructor.id
             );
 
-            setInstructors(
+            const updatedInstructors =
 
                 instructors.filter(
 
                     item =>
+
                         item.id !== instructor.id
-                )
+                );
+
+            setInstructors(
+                updatedInstructors
             );
 
             setSuccessMessage(
@@ -125,9 +111,7 @@ export default function InstructorListPage() {
 
         } catch (err) {
 
-            console.error(
-                err
-            );
+            console.error(err);
 
             setError(
                 "Could not delete instructor."
@@ -136,6 +120,7 @@ export default function InstructorListPage() {
     }
 
     const filteredInstructors =
+
         instructors.filter(
             (instructor) => {
 
@@ -146,63 +131,80 @@ export default function InstructorListPage() {
 
                     instructor.name
                         ?.toLowerCase()
-                        .includes(
-                            term
-                        )
+                        .includes(term)
 
                     ||
 
                     instructor.email
                         ?.toLowerCase()
-                        .includes(
-                            term
-                        )
+                        .includes(term)
 
                     ||
 
                     instructor.specialization
                         ?.toLowerCase()
-                        .includes(
-                            term
-                        )
+                        .includes(term)
 
                     ||
 
                     (
                         instructor.active
-                            ? "active"
-                            : "inactive"
-                    )
-                        .includes(
-                            term
-                        )
+
+                            ?
+
+                            "active"
+
+                            :
+
+                            "inactive"
+
+                    ).includes(term)
                 );
             }
         );
 
     const totalPages =
-        Math.max(
 
-            1,
+        Math.ceil(
+            filteredInstructors.length
+            /
+            pageSize
+        )
 
-            Math.ceil(
-                filteredInstructors.length
-                /
-                pageSize
-            )
+        ||
+
+        1;
+
+    const safeCurrentPage =
+
+        Math.min(
+            currentPage,
+            totalPages
         );
 
     const startIndex =
+
         (
-            currentPage - 1
+            safeCurrentPage
+            -
+            1
         )
+
         *
+
+        pageSize;
+
+    const endIndex =
+
+        startIndex
+        +
         pageSize;
 
     const paginatedInstructors =
+
         filteredInstructors.slice(
             startIndex,
-            startIndex + pageSize
+            endIndex
         );
 
     if (loading) {
@@ -235,11 +237,7 @@ export default function InstructorListPage() {
                 successMessage && (
 
                     <p>
-
-                        {
-                            successMessage
-                        }
-
+                        {successMessage}
                     </p>
                 )
             }
@@ -251,9 +249,7 @@ export default function InstructorListPage() {
                 }
 
                 onSearchChange={
-                    (
-                        value
-                    ) => {
+                    (value) => {
 
                         setSearchTerm(
                             value
@@ -276,8 +272,7 @@ export default function InstructorListPage() {
             />
 
             {
-                instructors.length
-                === 0 && (
+                instructors.length === 0 && (
 
                     <p>
                         No instructors found.
@@ -290,13 +285,14 @@ export default function InstructorListPage() {
 
                 &&
 
-                filteredInstructors.length
-                === 0 && (
+                filteredInstructors.length === 0
+
+                &&
+
+                (
 
                     <p>
-
                         No instructors match your search.
-
                     </p>
                 )
             }
@@ -309,9 +305,7 @@ export default function InstructorListPage() {
                     >
 
                         <button>
-
                             Create Instructor
-
                         </button>
 
                     </Link>
@@ -343,7 +337,6 @@ export default function InstructorListPage() {
                             }
 
                         />
-
                     )
                 )
             }
@@ -351,7 +344,7 @@ export default function InstructorListPage() {
             <Pagination
 
                 currentPage={
-                    currentPage
+                    safeCurrentPage
                 }
 
                 totalPages={
@@ -367,9 +360,7 @@ export default function InstructorListPage() {
                 }
 
                 onPageSizeChange={
-                    (
-                        size
-                    ) => {
+                    (size) => {
 
                         setPageSize(
                             size

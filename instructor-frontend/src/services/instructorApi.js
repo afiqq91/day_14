@@ -17,18 +17,16 @@ export async function getInstructorById(id) {
     return response.json();
 }
 
-export async function createInstructor(instructorData) {
-
-    const token = localStorage.getItem("token");
+export async function createInstructor(
+    instructorData
+) {
 
     const response = await axios.post(
+
         BASE_URL,
-        instructorData,
-        {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-        }
+
+        instructorData
+
     );
 
     return response.data;
@@ -47,19 +45,24 @@ export async function updateInstructor(id, instructorData) {
     return response.json();
 }
 
-export async function deleteInstructor(id) {
+export async function deleteInstructor(
+    id
+) {
 
-    const token = localStorage.getItem("token");
+    const response = await fetch(
 
-    const response = await fetch(`${BASE_URL}/${id}`, {
-        method: "DELETE",
-        headers: {
-            Authorization: `Bearer ${token}`,
-        },
-    });
+        `${BASE_URL}/${id}`,
+
+        {
+            method: "DELETE",
+        }
+    );
 
     if (!response.ok) {
-        throw new Error("Failed to delete instructor");
+
+        throw new Error(
+            "Failed to delete instructor"
+        );
     }
 
     return true;

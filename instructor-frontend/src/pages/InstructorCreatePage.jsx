@@ -1,38 +1,86 @@
 import { useNavigate } from "react-router-dom";
+
 import InstructorForm from "../components/InstructorForm";
-import { createInstructor } from "../services/instructorApi";
+
+import {
+    createInstructor
+} from "../services/instructorApi";
 
 function InstructorCreatePage() {
 
-    const navigate = useNavigate();
+    const navigate =
+        useNavigate();
 
-    async function handleCreateInstructor(data) {
+    async function handleCreateInstructor(
+        instructorData
+    ) {
 
         try {
 
-            await createInstructor(data);
+            await createInstructor(
 
-            alert("Instructor created successfully!");
+                instructorData
 
-            navigate("/instructors");
+            );
 
-        } catch (error) {
+            navigate(
 
-            console.error(error);
+                "/instructors"
 
-            alert("Failed to create instructor");
+            );
+
+        } catch (err) {
+
+            console.error(
+                err
+            );
+
+            alert(
+
+                JSON.stringify(
+
+                    err.response?.data,
+
+                    null,
+
+                    2
+
+                )
+
+                ||
+
+                err.message
+
+                ||
+
+                "Failed to create instructor"
+
+            );
         }
     }
 
     return (
+
         <div>
 
-            <h1>Create Instructor</h1>
+            <h1>
+
+                Create Instructor
+
+            </h1>
 
             <InstructorForm
-                initialData={null}
-                onSubmit={handleCreateInstructor}
-                buttonText="Create Instructor"
+
+                onSubmit={
+
+                    handleCreateInstructor
+
+                }
+
+                buttonText=
+
+                "Create Instructor"
+
             />
 
         </div>
