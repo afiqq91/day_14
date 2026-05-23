@@ -24,6 +24,21 @@ export default function InstructorListPage() {
     ] = useState([]);
 
     const [
+        loading,
+        setLoading
+    ] = useState(true);
+
+    const [
+        error,
+        setError
+    ] = useState("");
+
+    const [
+        successMessage,
+        setSuccessMessage
+    ] = useState("");
+
+    const [
         searchTerm,
         setSearchTerm
     ] = useState("");
@@ -36,7 +51,7 @@ export default function InstructorListPage() {
     const [
         pageSize,
         setPageSize
-    ] = useState(3);
+    ] = useState(5);
 
     const role =
         localStorage.getItem(
@@ -52,6 +67,8 @@ export default function InstructorListPage() {
 
             try {
 
+                setLoading(true);
+
                 const data =
                     await getAllInstructors();
 
@@ -59,10 +76,22 @@ export default function InstructorListPage() {
                     data
                 );
 
-            } catch (error) {
+                setError("");
+
+            } catch (err) {
 
                 console.error(
-                    error
+                    err
+                );
+
+                setError(
+                    "Could not load instructors."
+                );
+
+            } finally {
+
+                setLoading(
+                    false
                 );
             }
         }
@@ -90,10 +119,18 @@ export default function InstructorListPage() {
                 )
             );
 
-        } catch (error) {
+            setSuccessMessage(
+                "Instructor deleted successfully."
+            );
 
-            alert(
-                "Failed to delete instructor"
+        } catch (err) {
+
+            console.error(
+                err
+            );
+
+            setError(
+                "Could not delete instructor."
             );
         }
     }
@@ -144,10 +181,15 @@ export default function InstructorListPage() {
         );
 
     const totalPages =
-        Math.ceil(
-            filteredInstructors.length
-            /
-            pageSize
+        Math.max(
+
+            1,
+
+            Math.ceil(
+                filteredInstructors.length
+                /
+                pageSize
+            )
         );
 
     const startIndex =
@@ -163,6 +205,24 @@ export default function InstructorListPage() {
             startIndex + pageSize
         );
 
+    if (loading) {
+
+        return (
+            <p>
+                Loading instructors...
+            </p>
+        );
+    }
+
+    if (error) {
+
+        return (
+            <p>
+                {error}
+            </p>
+        );
+    }
+
     return (
 
         <div>
@@ -170,6 +230,19 @@ export default function InstructorListPage() {
             <h1>
                 Instructor List Page
             </h1>
+
+            {
+                successMessage && (
+
+                    <p>
+
+                        {
+                            successMessage
+                        }
+
+                    </p>
+                )
+            }
 
             <SearchBox
 
@@ -202,40 +275,31 @@ export default function InstructorListPage() {
 
             />
 
-            <Pagination
+            {
+                instructors.length
+                === 0 && (
 
-                currentPage={
-                    currentPage
-                }
+                    <p>
+                        No instructors found.
+                    </p>
+                )
+            }
 
-                totalPages={
-                    totalPages
-                }
+            {
+                instructors.length > 0
 
-                pageSize={
-                    pageSize
-                }
+                &&
 
-                onPageChange={
-                    setCurrentPage
-                }
+                filteredInstructors.length
+                === 0 && (
 
-                onPageSizeChange={
-                    (
-                        size
-                    ) => {
+                    <p>
 
-                        setPageSize(
-                            size
-                        );
+                        No instructors match your search.
 
-                        setCurrentPage(
-                            1
-                        );
-                    }
-                }
-
-            />
+                    </p>
+                )
+            }
 
             {
                 isAdmin && (
@@ -283,6 +347,41 @@ export default function InstructorListPage() {
                     )
                 )
             }
+
+            <Pagination
+
+                currentPage={
+                    currentPage
+                }
+
+                totalPages={
+                    totalPages
+                }
+
+                pageSize={
+                    pageSize
+                }
+
+                onPageChange={
+                    setCurrentPage
+                }
+
+                onPageSizeChange={
+                    (
+                        size
+                    ) => {
+
+                        setPageSize(
+                            size
+                        );
+
+                        setCurrentPage(
+                            1
+                        );
+                    }
+                }
+
+            />
 
         </div>
     );
