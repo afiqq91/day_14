@@ -1,8 +1,13 @@
-import { useEffect, useState } from "react";
+import {
+    useEffect,
+    useState
+} from "react";
 
 import { Link } from "react-router-dom";
 
 import InstructorCard from "../components/InstructorCard";
+
+import SearchBox from "../components/SearchBox";
 
 import {
     getAllInstructors,
@@ -11,11 +16,23 @@ import {
 
 export default function InstructorListPage() {
 
-    const [instructors, setInstructors] = useState([]);
+    const [
+        instructors,
+        setInstructors
+    ] = useState([]);
 
-    const role = localStorage.getItem("role");
+    const [
+        searchTerm,
+        setSearchTerm
+    ] = useState("");
 
-    const isAdmin = role === "ADMIN";
+    const role =
+        localStorage.getItem(
+            "role"
+        );
+
+    const isAdmin =
+        role === "ADMIN";
 
     useEffect(() => {
 
@@ -23,13 +40,18 @@ export default function InstructorListPage() {
 
             try {
 
-                const data = await getAllInstructors();
+                const data =
+                    await getAllInstructors();
 
-                setInstructors(data);
+                setInstructors(
+                    data
+                );
 
             } catch (error) {
 
-                console.error(error);
+                console.error(
+                    error
+                );
             }
         }
 
@@ -58,13 +80,60 @@ export default function InstructorListPage() {
 
         } catch (error) {
 
-            console.error(error);
+            console.error(
+                error
+            );
 
             alert(
                 "Failed to delete instructor"
             );
         }
     }
+
+    const filteredInstructors =
+        instructors.filter(
+            (instructor) => {
+
+                const term =
+                    searchTerm.toLowerCase();
+
+                return (
+
+                    instructor.name
+                        ?.toLowerCase()
+                        .includes(
+                            term
+                        )
+
+                    ||
+
+                    instructor.email
+                        ?.toLowerCase()
+                        .includes(
+                            term
+                        )
+
+                    ||
+
+                    instructor.specialization
+                        ?.toLowerCase()
+                        .includes(
+                            term
+                        )
+
+                    ||
+
+                    (
+                        instructor.active
+                            ? "active"
+                            : "inactive"
+                    )
+                        .includes(
+                            term
+                        )
+                );
+            }
+        );
 
     return (
 
@@ -73,6 +142,26 @@ export default function InstructorListPage() {
             <h1>
                 Instructor List Page
             </h1>
+
+            <SearchBox
+
+                searchTerm={
+                    searchTerm
+                }
+
+                onSearchChange={
+                    setSearchTerm
+                }
+
+                resultCount={
+                    filteredInstructors.length
+                }
+
+                totalCount={
+                    instructors.length
+                }
+
+            />
 
             {
                 isAdmin && (
@@ -92,8 +181,10 @@ export default function InstructorListPage() {
             }
 
             {
-                instructors.map(
-                    (instructor) => (
+                filteredInstructors.map(
+                    (
+                        instructor
+                    ) => (
 
                         <InstructorCard
 
