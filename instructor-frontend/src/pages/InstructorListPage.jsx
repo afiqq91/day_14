@@ -9,6 +9,8 @@ import InstructorCard from "../components/InstructorCard";
 
 import SearchBox from "../components/SearchBox";
 
+import Pagination from "../components/Pagination";
+
 import {
     getAllInstructors,
     deleteInstructor
@@ -25,6 +27,16 @@ export default function InstructorListPage() {
         searchTerm,
         setSearchTerm
     ] = useState("");
+
+    const [
+        currentPage,
+        setCurrentPage
+    ] = useState(1);
+
+    const [
+        pageSize,
+        setPageSize
+    ] = useState(3);
 
     const role =
         localStorage.getItem(
@@ -80,10 +92,6 @@ export default function InstructorListPage() {
 
         } catch (error) {
 
-            console.error(
-                error
-            );
-
             alert(
                 "Failed to delete instructor"
             );
@@ -135,6 +143,26 @@ export default function InstructorListPage() {
             }
         );
 
+    const totalPages =
+        Math.ceil(
+            filteredInstructors.length
+            /
+            pageSize
+        );
+
+    const startIndex =
+        (
+            currentPage - 1
+        )
+        *
+        pageSize;
+
+    const paginatedInstructors =
+        filteredInstructors.slice(
+            startIndex,
+            startIndex + pageSize
+        );
+
     return (
 
         <div>
@@ -150,7 +178,18 @@ export default function InstructorListPage() {
                 }
 
                 onSearchChange={
-                    setSearchTerm
+                    (
+                        value
+                    ) => {
+
+                        setSearchTerm(
+                            value
+                        );
+
+                        setCurrentPage(
+                            1
+                        );
+                    }
                 }
 
                 resultCount={
@@ -159,6 +198,41 @@ export default function InstructorListPage() {
 
                 totalCount={
                     instructors.length
+                }
+
+            />
+
+            <Pagination
+
+                currentPage={
+                    currentPage
+                }
+
+                totalPages={
+                    totalPages
+                }
+
+                pageSize={
+                    pageSize
+                }
+
+                onPageChange={
+                    setCurrentPage
+                }
+
+                onPageSizeChange={
+                    (
+                        size
+                    ) => {
+
+                        setPageSize(
+                            size
+                        );
+
+                        setCurrentPage(
+                            1
+                        );
+                    }
                 }
 
             />
@@ -181,7 +255,7 @@ export default function InstructorListPage() {
             }
 
             {
-                filteredInstructors.map(
+                paginatedInstructors.map(
                     (
                         instructor
                     ) => (
